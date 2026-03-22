@@ -272,21 +272,13 @@
     .match .diff { color: var(--grey-400); }
     .na .amount { color: var(--grey-400); }
 
-    .badge {
-      display: inline-flex;
-      align-items: center;
-      padding: 3px 8px;
-      border-radius: 2px;
-      font-size: 10px;
-      font-weight: 600;
-      letter-spacing: 0.08em;
-      text-transform: uppercase;
+    /* Row-level alert indicator */
+    tbody tr.row-alert {
+      border-left: 3px solid var(--red);
     }
-
-    .badge-alert { background: var(--red-light); color: var(--red); }
-    .badge-ok    { background: var(--green-light); color: var(--green); }
-    .badge-warn  { background: var(--amber-light); color: var(--amber); }
-    .badge-na    { background: var(--grey-200); color: var(--grey-400); }
+    tbody tr.row-alert td:first-child {
+      padding-left: 17px;
+    }
 
     /* RETAILERS KEY */
     .retailers-row {
@@ -368,7 +360,7 @@
       .summary-grid { grid-template-columns: repeat(2, 1fr); }
       .header { padding: 0 16px; }
       .main { padding: 24px 16px; }
-      thead th:nth-child(n+4), tbody td:nth-child(n+4) { display: none; }
+      thead th:nth-child(5), tbody td:nth-child(5) { display: none; }
     }
   </style>
 </head>
@@ -444,17 +436,16 @@
       <table>
         <thead>
           <tr>
-            <th style="width:30%">Product</th>
+            <th style="width:34%">Product</th>
             <th>MESH Price</th>
             <th>Marjoias</th>
             <th>Pereirinha</th>
             <th>Marcolino</th>
-            <th>Status</th>
           </tr>
         </thead>
         <tbody>
 
-          <tr>
+          <tr class="row-alert">
             <td>
               <div class="product-cell">
                 <img class="product-img"
@@ -475,7 +466,6 @@
             </td>
             <td><div class="retailer-price na"><span class="amount">—</span></div></td>
             <td><div class="retailer-price na"><span class="amount">—</span></div></td>
-            <td><span class="badge badge-alert">Above price</span></td>
           </tr>
 
           <tr>
@@ -494,10 +484,9 @@
             <td><div class="retailer-price match"><span class="amount">€50</span><span class="diff">Parity</span></div></td>
             <td><div class="retailer-price match"><span class="amount">€50</span><span class="diff">Parity</span></div></td>
             <td><div class="retailer-price na"><span class="amount">—</span></div></td>
-            <td><span class="badge badge-ok">On price</span></td>
           </tr>
 
-          <tr>
+          <tr class="row-alert">
             <td>
               <div class="product-cell">
                 <img class="product-img"
@@ -518,7 +507,6 @@
               </div>
             </td>
             <td><div class="retailer-price match"><span class="amount">€84</span><span class="diff">Parity</span></div></td>
-            <td><span class="badge badge-alert">Above price</span></td>
           </tr>
 
           <tr>
@@ -537,10 +525,9 @@
             <td><div class="retailer-price match"><span class="amount">€56</span><span class="diff">Parity</span></div></td>
             <td><div class="retailer-price na"><span class="amount">—</span></div></td>
             <td><div class="retailer-price match"><span class="amount">€56</span><span class="diff">Parity</span></div></td>
-            <td><span class="badge badge-ok">On price</span></td>
           </tr>
 
-          <tr>
+          <tr class="row-alert">
             <td>
               <div class="product-cell">
                 <img class="product-img"
@@ -561,7 +548,6 @@
             </td>
             <td><div class="retailer-price match"><span class="amount">€64</span><span class="diff">Parity</span></div></td>
             <td><div class="retailer-price na"><span class="amount">—</span></div></td>
-            <td><span class="badge badge-alert">Above price</span></td>
           </tr>
 
           <tr>
@@ -580,7 +566,6 @@
             <td><div class="retailer-price match"><span class="amount">€70</span><span class="diff">Parity</span></div></td>
             <td><div class="retailer-price match"><span class="amount">€70</span><span class="diff">Parity</span></div></td>
             <td><div class="retailer-price na"><span class="amount">—</span></div></td>
-            <td><span class="badge badge-ok">On price</span></td>
           </tr>
 
           <tr>
@@ -599,7 +584,6 @@
             <td><div class="retailer-price na"><span class="amount">—</span></div></td>
             <td><div class="retailer-price na"><span class="amount">—</span></div></td>
             <td><div class="retailer-price match"><span class="amount">€98</span><span class="diff">Parity</span></div></td>
-            <td><span class="badge badge-ok">On price</span></td>
           </tr>
 
           <tr>
@@ -618,7 +602,6 @@
             <td><div class="retailer-price na"><span class="amount">—</span></div></td>
             <td><div class="retailer-price na"><span class="amount">—</span></div></td>
             <td><div class="retailer-price na"><span class="amount">—</span></div></td>
-            <td><span class="badge badge-na">Not listed</span></td>
           </tr>
 
         </tbody>
