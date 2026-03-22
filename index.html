@@ -331,10 +331,10 @@
       color: var(--grey-400);
     }
 
-    /* ALERT BANNER */
-    .alert-banner {
-      background: var(--red-light);
-      border: 1px solid #f0ccc4;
+    /* DEMO BANNER */
+    .demo-banner {
+      background: #e8f0fe;
+      border: 1px solid #c4d7f5;
       border-radius: 2px;
       padding: 14px 20px;
       margin-bottom: 32px;
@@ -343,18 +343,18 @@
       gap: 12px;
     }
 
-    .alert-icon {
+    .demo-icon {
       font-size: 16px;
       flex-shrink: 0;
     }
 
-    .alert-text {
+    .demo-text {
       font-size: 12px;
-      color: var(--red);
+      color: #1a56db;
       line-height: 1.5;
     }
 
-    .alert-text strong { font-weight: 600; }
+    .demo-text strong { font-weight: 600; }
 
     @media (max-width: 768px) {
       .summary-grid { grid-template-columns: repeat(2, 1fr); }
@@ -374,8 +374,7 @@
     </div>
     <div class="header-meta">
       <div class="status-pill">
-        <div class="status-dot"></div>
-        Live
+        Demo
       </div>
       <div class="last-updated">Last checked: today, 19:00</div>
     </div>
@@ -383,12 +382,12 @@
 
   <main class="main">
 
-    <!-- ALERT BANNER -->
-    <div class="alert-banner">
-      <div class="alert-icon">⚠</div>
-      <div class="alert-text">
-        <strong>3 pricing discrepancies detected.</strong>
-        Marjoias is listing Bagel Hoop Earrings at €89 — 27% above MESH retail price.
+    <!-- DEMO BANNER -->
+    <div class="demo-banner">
+      <div class="demo-icon">ℹ</div>
+      <div class="demo-text">
+        <strong>This is a working demo.</strong>
+        The product names, prices, and retailers shown here are real Mesh data. Right now the prices are a snapshot — once connected, this updates automatically.
       </div>
     </div>
 
