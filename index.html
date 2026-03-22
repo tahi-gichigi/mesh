@@ -1,0 +1,636 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>MESH — Retailer Price Monitor</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --black: #0a0a0a;
+      --white: #ffffff;
+      --grey-100: #f5f5f5;
+      --grey-200: #e8e8e8;
+      --grey-400: #9a9a9a;
+      --grey-600: #5c5c5c;
+      --green: #1a6b3c;
+      --green-light: #e6f4ed;
+      --red: #a0321a;
+      --red-light: #faede9;
+      --amber: #8a6000;
+      --amber-light: #fdf5e0;
+    }
+
+    body {
+      font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+      background: var(--grey-100);
+      color: var(--black);
+      min-height: 100vh;
+      font-size: 14px;
+    }
+
+    /* HEADER */
+    .header {
+      background: var(--white);
+      border-bottom: 1px solid var(--grey-200);
+      padding: 0 32px;
+      height: 64px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+
+    .header-logo {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .header-logo img {
+      height: 22px;
+      filter: invert(0);
+    }
+
+    .header-divider {
+      width: 1px;
+      height: 20px;
+      background: var(--grey-200);
+    }
+
+    .header-subtitle {
+      font-size: 11px;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--grey-400);
+      font-weight: 500;
+    }
+
+    .header-meta {
+      display: flex;
+      align-items: center;
+      gap: 20px;
+    }
+
+    .status-pill {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 11px;
+      letter-spacing: 0.06em;
+      color: var(--grey-600);
+    }
+
+    .status-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: var(--green);
+      animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.4; }
+    }
+
+    .last-updated {
+      font-size: 11px;
+      color: var(--grey-400);
+      letter-spacing: 0.04em;
+    }
+
+    /* MAIN LAYOUT */
+    .main {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 40px 24px;
+    }
+
+    /* SUMMARY CARDS */
+    .summary-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 16px;
+      margin-bottom: 40px;
+    }
+
+    .summary-card {
+      background: var(--white);
+      border: 1px solid var(--grey-200);
+      padding: 24px;
+      border-radius: 2px;
+    }
+
+    .summary-card .label {
+      font-size: 10px;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--grey-400);
+      font-weight: 600;
+      margin-bottom: 10px;
+    }
+
+    .summary-card .value {
+      font-size: 28px;
+      font-weight: 300;
+      letter-spacing: -0.02em;
+      color: var(--black);
+      line-height: 1;
+    }
+
+    .summary-card .value.alert { color: var(--red); }
+    .summary-card .value.ok { color: var(--green); }
+    .summary-card .sub {
+      font-size: 11px;
+      color: var(--grey-400);
+      margin-top: 6px;
+    }
+
+    /* SECTION HEADING */
+    .section-header {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      margin-bottom: 16px;
+    }
+
+    .section-title {
+      font-size: 11px;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      font-weight: 600;
+      color: var(--grey-600);
+    }
+
+    .section-note {
+      font-size: 11px;
+      color: var(--grey-400);
+    }
+
+    /* TABLE */
+    .table-wrap {
+      background: var(--white);
+      border: 1px solid var(--grey-200);
+      border-radius: 2px;
+      overflow: hidden;
+      margin-bottom: 32px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    thead th {
+      font-size: 10px;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--grey-400);
+      font-weight: 600;
+      padding: 14px 20px;
+      text-align: left;
+      border-bottom: 1px solid var(--grey-200);
+      background: var(--grey-100);
+    }
+
+    tbody tr {
+      border-bottom: 1px solid var(--grey-200);
+      transition: background 0.1s;
+    }
+
+    tbody tr:last-child { border-bottom: none; }
+    tbody tr:hover { background: var(--grey-100); }
+
+    tbody td {
+      padding: 16px 20px;
+      vertical-align: middle;
+    }
+
+    .product-cell {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+
+    .product-img {
+      width: 44px;
+      height: 44px;
+      object-fit: cover;
+      border-radius: 2px;
+      background: var(--grey-100);
+      flex-shrink: 0;
+    }
+
+    .product-name {
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--black);
+      line-height: 1.3;
+    }
+
+    .product-type {
+      font-size: 11px;
+      color: var(--grey-400);
+      margin-top: 2px;
+    }
+
+    .price {
+      font-size: 14px;
+      font-weight: 500;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .price-mesh { color: var(--black); }
+
+    .retailer-price {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+
+    .retailer-price .amount {
+      font-size: 13px;
+      font-weight: 500;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .retailer-price .diff {
+      font-size: 10px;
+      font-weight: 600;
+      letter-spacing: 0.06em;
+    }
+
+    .up .amount { color: var(--red); }
+    .up .diff { color: var(--red); }
+    .down .amount { color: var(--green); }
+    .down .diff { color: var(--green); }
+    .match .amount { color: var(--grey-600); }
+    .match .diff { color: var(--grey-400); }
+    .na .amount { color: var(--grey-400); }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      padding: 3px 8px;
+      border-radius: 2px;
+      font-size: 10px;
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    .badge-alert { background: var(--red-light); color: var(--red); }
+    .badge-ok    { background: var(--green-light); color: var(--green); }
+    .badge-warn  { background: var(--amber-light); color: var(--amber); }
+    .badge-na    { background: var(--grey-200); color: var(--grey-400); }
+
+    /* RETAILERS KEY */
+    .retailers-row {
+      display: flex;
+      gap: 12px;
+      margin-bottom: 28px;
+      flex-wrap: wrap;
+    }
+
+    .retailer-tag {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: var(--white);
+      border: 1px solid var(--grey-200);
+      padding: 8px 14px;
+      border-radius: 2px;
+      font-size: 12px;
+      color: var(--grey-600);
+    }
+
+    .retailer-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+    }
+
+    .dot-r1 { background: #2563eb; }
+    .dot-r2 { background: #7c3aed; }
+    .dot-r3 { background: #0891b2; }
+
+    /* FOOTER */
+    .footer {
+      margin-top: 60px;
+      padding-top: 24px;
+      border-top: 1px solid var(--grey-200);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .footer-left {
+      font-size: 11px;
+      color: var(--grey-400);
+      letter-spacing: 0.04em;
+    }
+
+    .footer-right {
+      font-size: 11px;
+      color: var(--grey-400);
+    }
+
+    /* ALERT BANNER */
+    .alert-banner {
+      background: var(--red-light);
+      border: 1px solid #f0ccc4;
+      border-radius: 2px;
+      padding: 14px 20px;
+      margin-bottom: 32px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .alert-icon {
+      font-size: 16px;
+      flex-shrink: 0;
+    }
+
+    .alert-text {
+      font-size: 12px;
+      color: var(--red);
+      line-height: 1.5;
+    }
+
+    .alert-text strong { font-weight: 600; }
+
+    @media (max-width: 768px) {
+      .summary-grid { grid-template-columns: repeat(2, 1fr); }
+      .header { padding: 0 16px; }
+      .main { padding: 24px 16px; }
+      thead th:nth-child(n+4), tbody td:nth-child(n+4) { display: none; }
+    }
+  </style>
+</head>
+<body>
+
+  <header class="header">
+    <div class="header-logo">
+      <img src="https://www.meshlabel.com/cdn/shop/files/logo-mesh.png?v=1680276261&width=260" alt="MESH" />
+      <div class="header-divider"></div>
+      <span class="header-subtitle">Price Monitor</span>
+    </div>
+    <div class="header-meta">
+      <div class="status-pill">
+        <div class="status-dot"></div>
+        Live
+      </div>
+      <div class="last-updated">Last checked: today, 19:00</div>
+    </div>
+  </header>
+
+  <main class="main">
+
+    <!-- ALERT BANNER -->
+    <div class="alert-banner">
+      <div class="alert-icon">⚠</div>
+      <div class="alert-text">
+        <strong>3 pricing discrepancies detected.</strong>
+        Marjoias is listing Bagel Hoop Earrings at €89 — 27% above MESH retail price.
+      </div>
+    </div>
+
+    <!-- SUMMARY CARDS -->
+    <div class="summary-grid">
+      <div class="summary-card">
+        <div class="label">Products tracked</div>
+        <div class="value">8</div>
+        <div class="sub">across 3 retailers</div>
+      </div>
+      <div class="summary-card">
+        <div class="label">Pricing alerts</div>
+        <div class="value alert">3</div>
+        <div class="sub">above MESH price</div>
+      </div>
+      <div class="summary-card">
+        <div class="label">Matching price</div>
+        <div class="value ok">4</div>
+        <div class="sub">products in parity</div>
+      </div>
+      <div class="summary-card">
+        <div class="label">Not listed</div>
+        <div class="value">8</div>
+        <div class="sub">products not stocked</div>
+      </div>
+    </div>
+
+    <!-- RETAILERS KEY -->
+    <div class="section-header">
+      <span class="section-title">Retailers monitored</span>
+    </div>
+    <div class="retailers-row">
+      <div class="retailer-tag"><div class="retailer-dot dot-r1"></div>marjoias.pt</div>
+      <div class="retailer-tag"><div class="retailer-dot dot-r2"></div>pereirinha.com</div>
+      <div class="retailer-tag"><div class="retailer-dot dot-r3"></div>marcolinolink.pt</div>
+    </div>
+
+    <!-- PRICE TABLE -->
+    <div class="section-header">
+      <span class="section-title">Price comparison</span>
+      <span class="section-note">MESH retail vs. retailer listing price</span>
+    </div>
+
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th style="width:30%">Product</th>
+            <th>MESH Price</th>
+            <th>Marjoias</th>
+            <th>Pereirinha</th>
+            <th>Marcolino</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody>
+
+          <tr>
+            <td>
+              <div class="product-cell">
+                <img class="product-img"
+                  src="https://cdn.shopify.com/s/files/1/0626/6984/8914/files/MESH_BAGELHOOPS.png"
+                  alt="Bagel Hoop Earrings" />
+                <div>
+                  <div class="product-name">Bagel Hoop Earrings</div>
+                  <div class="product-type">Sterling Silver</div>
+                </div>
+              </div>
+            </td>
+            <td><span class="price price-mesh">€70</span></td>
+            <td>
+              <div class="retailer-price up">
+                <span class="amount">€89</span>
+                <span class="diff">+27%</span>
+              </div>
+            </td>
+            <td><div class="retailer-price na"><span class="amount">—</span></div></td>
+            <td><div class="retailer-price na"><span class="amount">—</span></div></td>
+            <td><span class="badge badge-alert">Above price</span></td>
+          </tr>
+
+          <tr>
+            <td>
+              <div class="product-cell">
+                <img class="product-img"
+                  src="https://cdn.shopify.com/s/files/1/0626/6984/8914/files/Ona_hoops_925silver_essentials.jpg"
+                  alt="Ona Hoops" />
+                <div>
+                  <div class="product-name">Ona Hoops</div>
+                  <div class="product-type">Sterling Silver</div>
+                </div>
+              </div>
+            </td>
+            <td><span class="price price-mesh">€50</span></td>
+            <td><div class="retailer-price match"><span class="amount">€50</span><span class="diff">Parity</span></div></td>
+            <td><div class="retailer-price match"><span class="amount">€50</span><span class="diff">Parity</span></div></td>
+            <td><div class="retailer-price na"><span class="amount">—</span></div></td>
+            <td><span class="badge badge-ok">On price</span></td>
+          </tr>
+
+          <tr>
+            <td>
+              <div class="product-cell">
+                <img class="product-img"
+                  src="https://cdn.shopify.com/s/files/1/0626/6984/8914/files/Mesh_Isla-earrings-blue.jpg"
+                  alt="Isla Hoop Earrings" />
+                <div>
+                  <div class="product-name">Isla Hoop Earrings</div>
+                  <div class="product-type">Sterling Silver</div>
+                </div>
+              </div>
+            </td>
+            <td><span class="price price-mesh">€84</span></td>
+            <td><div class="retailer-price na"><span class="amount">—</span></div></td>
+            <td>
+              <div class="retailer-price up">
+                <span class="amount">€99</span>
+                <span class="diff">+18%</span>
+              </div>
+            </td>
+            <td><div class="retailer-price match"><span class="amount">€84</span><span class="diff">Parity</span></div></td>
+            <td><span class="badge badge-alert">Above price</span></td>
+          </tr>
+
+          <tr>
+            <td>
+              <div class="product-cell">
+                <img class="product-img"
+                  src="https://cdn.shopify.com/s/files/1/0626/6984/8914/files/Ayer_ring.png"
+                  alt="Ayer Ring" />
+                <div>
+                  <div class="product-name">Ayer Ring</div>
+                  <div class="product-type">Sterling Silver</div>
+                </div>
+              </div>
+            </td>
+            <td><span class="price price-mesh">€56</span></td>
+            <td><div class="retailer-price match"><span class="amount">€56</span><span class="diff">Parity</span></div></td>
+            <td><div class="retailer-price na"><span class="amount">—</span></div></td>
+            <td><div class="retailer-price match"><span class="amount">€56</span><span class="diff">Parity</span></div></td>
+            <td><span class="badge badge-ok">On price</span></td>
+          </tr>
+
+          <tr>
+            <td>
+              <div class="product-cell">
+                <img class="product-img"
+                  src="https://cdn.shopify.com/s/files/1/0626/6984/8914/files/Amber_pearl_earrings.png"
+                  alt="Amber Pearl Earrings" />
+                <div>
+                  <div class="product-name">Amber Pearl Earrings</div>
+                  <div class="product-type">Sterling Silver</div>
+                </div>
+              </div>
+            </td>
+            <td><span class="price price-mesh">€64</span></td>
+            <td>
+              <div class="retailer-price up">
+                <span class="amount">€75</span>
+                <span class="diff">+17%</span>
+              </div>
+            </td>
+            <td><div class="retailer-price match"><span class="amount">€64</span><span class="diff">Parity</span></div></td>
+            <td><div class="retailer-price na"><span class="amount">—</span></div></td>
+            <td><span class="badge badge-alert">Above price</span></td>
+          </tr>
+
+          <tr>
+            <td>
+              <div class="product-cell">
+                <img class="product-img"
+                  src="https://cdn.shopify.com/s/files/1/0626/6984/8914/files/Amber_pearl.png"
+                  alt="Amber Pearl Ring" />
+                <div>
+                  <div class="product-name">Amber Pearl Ring</div>
+                  <div class="product-type">Sterling Silver</div>
+                </div>
+              </div>
+            </td>
+            <td><span class="price price-mesh">€70</span></td>
+            <td><div class="retailer-price match"><span class="amount">€70</span><span class="diff">Parity</span></div></td>
+            <td><div class="retailer-price match"><span class="amount">€70</span><span class="diff">Parity</span></div></td>
+            <td><div class="retailer-price na"><span class="amount">—</span></div></td>
+            <td><span class="badge badge-ok">On price</span></td>
+          </tr>
+
+          <tr>
+            <td>
+              <div class="product-cell">
+                <img class="product-img"
+                  src="https://cdn.shopify.com/s/files/1/0626/6984/8914/files/Astrid_ring.png"
+                  alt="Astrid Ring" />
+                <div>
+                  <div class="product-name">Astrid Ring</div>
+                  <div class="product-type">Sterling Silver</div>
+                </div>
+              </div>
+            </td>
+            <td><span class="price price-mesh">€98</span></td>
+            <td><div class="retailer-price na"><span class="amount">—</span></div></td>
+            <td><div class="retailer-price na"><span class="amount">—</span></div></td>
+            <td><div class="retailer-price match"><span class="amount">€98</span><span class="diff">Parity</span></div></td>
+            <td><span class="badge badge-ok">On price</span></td>
+          </tr>
+
+          <tr>
+            <td>
+              <div class="product-cell">
+                <img class="product-img"
+                  src="https://cdn.shopify.com/s/files/1/0626/6984/8914/files/Lucky_earring.png"
+                  alt="Lucky Earring" />
+                <div>
+                  <div class="product-name">Lucky Earring</div>
+                  <div class="product-type">Sterling Silver</div>
+                </div>
+              </div>
+            </td>
+            <td><span class="price price-mesh">€36</span></td>
+            <td><div class="retailer-price na"><span class="amount">—</span></div></td>
+            <td><div class="retailer-price na"><span class="amount">—</span></div></td>
+            <td><div class="retailer-price na"><span class="amount">—</span></div></td>
+            <td><span class="badge badge-na">Not listed</span></td>
+          </tr>
+
+        </tbody>
+      </table>
+    </div>
+
+    <div class="footer">
+      <div class="footer-left">MESH Retailer Price Monitor · Prototype</div>
+      <div class="footer-right">Built by Mooch · mooch.agency</div>
+    </div>
+
+  </main>
+
+</body>
+</html>
