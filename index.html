@@ -176,8 +176,13 @@
       background: var(--white);
       border: 1px solid var(--grey-200);
       border-radius: 2px;
-      overflow: hidden;
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
       margin-bottom: 32px;
+    }
+
+    .table-wrap table {
+      min-width: 600px;
     }
 
     table {
@@ -360,7 +365,7 @@
       .summary-grid { grid-template-columns: repeat(2, 1fr); }
       .header { padding: 0 16px; }
       .main { padding: 24px 16px; }
-      thead th:nth-child(5), tbody td:nth-child(5) { display: none; }
+      .footer { flex-direction: column; gap: 8px; text-align: center; }
     }
   </style>
 </head>
@@ -387,7 +392,7 @@
       <div class="demo-icon">ℹ</div>
       <div class="demo-text">
         <strong>This is a working demo.</strong>
-        The product names, prices, and retailers shown here are real Mesh data. Right now the prices are a snapshot — once connected, this updates automatically.
+        Once connected, prices will update automatically.
       </div>
     </div>
 
